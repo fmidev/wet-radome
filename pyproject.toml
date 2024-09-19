@@ -1,0 +1,64 @@
+[build-system]
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
+
+[project]
+name = "wet-radome"
+dynamic = ["version"]
+description = 'Wet radome attenuation correction'
+readme = "README.md"
+requires-python = ">=3.8"
+license = "MIT"
+keywords = []
+authors = [
+  { name = "Jussi Tiira", email = "jussi.tiira@fmi.fi" },
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: Implementation :: CPython",
+  "Programming Language :: Python :: Implementation :: PyPy",
+]
+dependencies = [
+  "click",
+  "xradar",
+]
+
+#[project.urls]
+#Documentation = "https://github.com/Jussi Tiira/wet-radome#readme"
+#Issues = "https://github.com/Jussi Tiira/wet-radome/issues"
+#Source = "https://github.com/Jussi Tiira/wet-radome"
+
+[tool.hatch.version]
+source = "vcs"
+
+[project.scripts]
+wet-radome = "wetrad.cli:wetrad"
+
+[tool.hatch.envs.types]
+extra-dependencies = [
+  "mypy>=1.0.0",
+]
+[tool.hatch.envs.types.scripts]
+check = "mypy --install-types --non-interactive {args:src/wetrad tests}"
+
+[tool.coverage.run]
+source_pkgs = ["wetrad", "tests"]
+branch = true
+parallel = true
+
+[tool.coverage.paths]
+wetrad = ["src/wetrad", "*/wet-radome/src/wetrad"]
+tests = ["tests", "*/wet-radome/tests"]
+
+[tool.coverage.report]
+exclude_lines = [
+  "no cov",
+  "if __name__ == .__main__.:",
+  "if TYPE_CHECKING:",
+]
