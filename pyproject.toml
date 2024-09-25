@@ -27,6 +27,12 @@ classifiers = [
 dependencies = [
   "click",
   "xradar",
+  "wradlib",
+  "gdal[numpy]==3.8.5.*",
+  "h5py",
+  "h5netcdf",
+  "netCDF4",
+  "dask",
 ]
 
 #[project.urls]
