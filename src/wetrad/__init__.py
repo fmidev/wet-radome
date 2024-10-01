@@ -1,6 +1,7 @@
 import os
 
 import matplotlib.pyplot as plt
+import numpy as np
 import xarray as xr
 import xradar as xd
 
@@ -15,8 +16,8 @@ def plot_ppi(da, ax=None, **kws):
     return ax
 
 
-def plot_dbz(ds, minv=-10, **kws):
-    dbz = ds.DBZH.where(ds.DBZH >= minv)
+def plot_dbz(dbz, minv=-10, **kws):
+    dbz = dbz.where(dbz >= minv)
     ax = plot_ppi(dbz, vmin=-22, vmax=60, cmap="gist_ncar", **kws)
     return ax
 
@@ -29,18 +30,40 @@ def plot_rings(ds, gates=(10,), **kws):
     return ax
 
 
-def intense_precip_over_radar(swp, gates=(10,), dbz_thr=45, fraction=0.9):
-    """Check if the radar is in intense precipitation."""
-    dbz_at_gates = swp.DBZH.isel(range=gates)
-    return (dbz_at_gates >= dbz_thr).sum() / len(gates) >= fraction
+def percentile_at_range(da, ranges=[15], quantile=0.5):
+    """percentile at given range gates"""
+    return da.isel(range=ranges).quantile(quantile).values.item()
+
+
+def linear_attn_adjust(dbz, dbz_min=30, dbz_max=45, adjust_max=6.5, **kws):
+    """Linear wet radome attenuation adjustment"""
+    percentile = percentile_at_range(dbz, **kws)
+    if percentile < dbz_min:
+        return 0.0
+    elif percentile > dbz_max:
+        return adjust_max
+    else:
+        return adjust_max * (percentile - dbz_min) / (dbz_max - dbz_min)
+    
+
+def open_xradar(filename, group="sweep_2", engine="odim"):
+    """open_dataset xradar wrapper"""
+    return xr.open_dataset(filename, group=group, engine=engine).xradar.georeference()
 
 
 if __name__ == "__main__":
-    filename = os.path.expanduser("~/data/polar/filuo/202208170030_radar.polar.filuo.h5")
-    ds = xr.open_dataset(filename, group="sweep_0", engine="odim").xradar.georeference()
-    ax = plot_dbz(ds)
+    plt.close("all")
+    filename0 = os.path.expanduser("~/data/polar/fiuta/202208051330_radar.polar.fiuta.h5")
+    filename1 = os.path.expanduser("~/data/polar/fiuta/202208051335_radar.polar.fiuta.h5")
+    #xd.io.open_odim_datatree(filename1)
+    ds0 = open_xradar(filename0)
+    ds1 = open_xradar(filename1)
+    ax = plot_dbz(ds1.TH)
     rangem = 50e3
     ax.set_xlim(-rangem, rangem)
     ax.set_ylim(-rangem, rangem)
-    gates = (15,)
-    plot_rings(ds, gates=gates, ax=ax)
+    gates = [5]
+    plot_rings(ds1, gates=gates, ax=ax)
+    adj0 = linear_attn_adjust(ds0.TH, ranges=gates)
+    adj1 = linear_attn_adjust(ds1.TH, ranges=gates)
+    adj = min(adj0, adj1)
