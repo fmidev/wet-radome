@@ -7,6 +7,7 @@ import xradar as xd
 
 
 def plot_ppi(da, ax=None, **kws):
+    """plot PPI"""
     if ax is None:
         fig, ax = plt.subplots()
     else:
@@ -17,12 +18,14 @@ def plot_ppi(da, ax=None, **kws):
 
 
 def plot_dbz(dbz, minv=-10, **kws):
+    """plot reflectivity"""
     dbz = dbz.where(dbz >= minv)
     ax = plot_ppi(dbz, vmin=-22, vmax=60, cmap="gist_ncar", **kws)
     return ax
 
 
 def plot_rings(ds, gates=(10,), **kws):
+    """plot rings at given range gates"""
     rings = ds.TH.copy()
     rings.data.fill(0)
     rings.data[:, gates] = 1.0
@@ -51,6 +54,13 @@ def open_xradar(filename, group="sweep_2", engine="odim"):
     return xr.open_dataset(filename, group=group, engine=engine).xradar.georeference()
 
 
+def wet_radome_attn(ds0, ds1, gates=[5]):
+    """Wet radome attenuation in dB"""
+    adj0 = linear_attn_adjust(ds0.TH, ranges=gates)
+    adj1 = linear_attn_adjust(ds1.TH, ranges=gates)
+    return min(adj0, adj1)
+
+
 if __name__ == "__main__":
     plt.close("all")
     filename0 = os.path.expanduser("~/data/polar/fiuta/202208051330_radar.polar.fiuta.h5")
@@ -64,6 +74,4 @@ if __name__ == "__main__":
     ax.set_ylim(-rangem, rangem)
     gates = [5]
     plot_rings(ds1, gates=gates, ax=ax)
-    adj0 = linear_attn_adjust(ds0.TH, ranges=gates)
-    adj1 = linear_attn_adjust(ds1.TH, ranges=gates)
-    adj = min(adj0, adj1)
+    print(wet_radome_attn(ds0, ds1, gates=gates))
