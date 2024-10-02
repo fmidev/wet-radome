@@ -44,7 +44,7 @@ dependencies = [
 source = "vcs"
 
 [project.scripts]
-wet-radome = "wetrad.cli:wetrad"
+wetrad = "wetrad.cli:wetrad"
 
 [tool.hatch.envs.types]
 extra-dependencies = [
