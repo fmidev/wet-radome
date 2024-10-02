@@ -14,9 +14,10 @@ from wetrad import wet_radome_attn, open_xradar
     default=[5],
     help="Range gates to consider",
 )
+@click.version_option()
 def wetrad(file0, file1, ranges):
     """The wetrad command line interface."""
     ds0 = open_xradar(file0)
     ds1 = open_xradar(file1)
-    attn = wet_radome_attn(ds0, ds1, gates=ranges)
+    attn = wet_radome_attn(ds0, ds1, gates=list(ranges))
     print(f"Wet radome attenuation: {attn:.1f} dB")

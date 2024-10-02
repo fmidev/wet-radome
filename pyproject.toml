@@ -3,7 +3,7 @@ requires = ["hatchling", "hatch-vcs"]
 build-backend = "hatchling.build"
 
 [project]
-name = "wet-radome"
+name = "wetrad"
 dynamic = ["version"]
 description = 'Wet radome attenuation correction'
 readme = "README.md"
@@ -28,7 +28,7 @@ dependencies = [
   "click",
   "xradar",
   "wradlib",
-  "gdal[numpy]==3.8.5.*",
+  #"gdal[numpy]==3.8.5.*",
   "h5py",
   "h5netcdf",
   "netCDF4",
@@ -45,6 +45,9 @@ source = "vcs"
 
 [project.scripts]
 wetrad = "wetrad.cli:wetrad"
+
+[tool.hatch.envs.default]
+system-site-packages = true
 
 [tool.hatch.envs.types]
 extra-dependencies = [
