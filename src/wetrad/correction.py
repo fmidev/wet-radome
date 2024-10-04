@@ -20,7 +20,7 @@ def apply_correction_sweep(swp, attenuation, field='DBZH'):
     out = swp.copy()
     try:
         out[field] += attenuation
-    except KeyError:
+    except KeyError: # root group has only metadata
         return swp.copy()
     return out
 
@@ -42,4 +42,3 @@ if __name__ == '__main__':
     ds1 = xd.io.open_odim_datatree(filename1)
     attn = 0.5
     apply_correction_odim(filename1, filename1.replace(".h5", ".wetrad.h5"), attn)
-    print(f"Attenuation: {attn:.2f} dB")

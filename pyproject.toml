@@ -35,10 +35,8 @@ dependencies = [
   "dask",
 ]
 
-#[project.urls]
-#Documentation = "https://github.com/Jussi Tiira/wet-radome#readme"
-#Issues = "https://github.com/Jussi Tiira/wet-radome/issues"
-#Source = "https://github.com/Jussi Tiira/wet-radome"
+[project.urls]
+Source = "https://github.com/fmidev/wet-radome"
 
 [tool.hatch.version]
 source = "vcs"
