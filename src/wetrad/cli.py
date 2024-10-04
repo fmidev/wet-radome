@@ -1,6 +1,7 @@
 import click
 
-from wetrad import wet_radome_attn, open_xradar
+from wetrad.estimation import wet_radome_attn, open_xradar
+from wetrad.correction import apply_correction_odim
 
 
 @click.command()
@@ -14,10 +15,23 @@ from wetrad import wet_radome_attn, open_xradar
     default=[5],
     help="Range gates to consider",
 )
+@click.option(
+    "--output",
+    "-o",
+    type=click.Path(),
+    help="Output ODIM H5 file",
+)
 @click.version_option()
-def wetrad(file0, file1, ranges):
-    """The wetrad command line interface."""
+def wetrad(file0, file1, ranges, output):
+    """Wet radome attenuation correction.
+
+    Compute wet radome attenuation for FILE1.
+    FILE0 is the previous scan used for estimating the persistence of precipitation.
+    """
     ds0 = open_xradar(file0)
     ds1 = open_xradar(file1)
     attn = wet_radome_attn(ds0, ds1, gates=list(ranges))
-    print(f"Wet radome attenuation: {attn:.1f} dB")
+    if output:
+        apply_correction_odim(file1, output, attn)
+    else:
+        print(f"{attn:.2f}")
